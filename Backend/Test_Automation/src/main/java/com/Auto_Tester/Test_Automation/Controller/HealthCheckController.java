@@ -5,13 +5,13 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController("status")
 public class HealthCheckController {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @GetMapping("/status")
+    @GetMapping
     public String checkStatus() {
         try {
             mongoTemplate.getDb().getName(); // Triggers a connection test
