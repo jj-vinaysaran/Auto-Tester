@@ -14,6 +14,7 @@ public class Configurations {
     private String productId;
     private String capabilityId;
     private String testCaseId;
+    private String configName;
     private int numberOfFields;
     private List<Field> fields;
     

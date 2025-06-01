@@ -13,5 +13,5 @@ public class TestCases {
     private String productId;
     private String capabilityId;
     private String testCaseName;
-    private String numberOfConfigurations;
+    private int numberOfConfigurations;
 }

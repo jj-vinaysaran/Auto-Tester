@@ -10,6 +10,6 @@ public class User {
     @Id
     // Platform Login 
     private String userId;
-    private String username;
+    private String userName;
     private String password;
 }
