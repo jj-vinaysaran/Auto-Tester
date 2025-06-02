@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ConfigurationDTO {
+public class ConfigurationsDTO {
     
     private String configurationId;
     private String productId;

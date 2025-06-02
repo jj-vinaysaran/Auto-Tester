@@ -1,15 +1,15 @@
 package com.Auto_Tester.Test_Automation.Mapper;
 
-import com.Auto_Tester.Test_Automation.DTO.ConfigurationDTO;
+import com.Auto_Tester.Test_Automation.DTO.ConfigurationsDTO;
 import com.Auto_Tester.Test_Automation.Model.Configurations;
 import java.util.stream.Collectors;
 
 public class ConfigurationMapper {
 
-    public static ConfigurationDTO toDTO(Configurations config){
+    public static ConfigurationsDTO toDTO(Configurations config){
         if (config == null) return null;
 
-        ConfigurationDTO dto = new ConfigurationDTO();
+        ConfigurationsDTO dto = new ConfigurationsDTO();
         dto.setConfigurationId(config.getConfigurationId());
         dto.setProductId(config.getProductId());
         dto.setCapabilityId(config.getCapabilityId());
@@ -27,7 +27,7 @@ public class ConfigurationMapper {
         return dto;
     }
 
-    public static Configurations toEntity(ConfigurationDTO dto ){
+    public static Configurations toEntity(ConfigurationsDTO dto ){
         if (dto == null) return null;
 
         Configurations config = new Configurations();
