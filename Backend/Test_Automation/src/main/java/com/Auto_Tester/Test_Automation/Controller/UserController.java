@@ -14,50 +14,49 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
 
-    // Create User (Signup)
     @PostMapping("/signup")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
-        String username = userDTO.getUserName();
-        String password = userDTO.getPassword();
+        try {
+            String username = userDTO.getUserName();
+            String password = userDTO.getPassword();
+            if (username == null || username.length() != 6) {
+                return ResponseEntity.badRequest().body("Username must be exactly 6 characters.");
+            }
+            if (password == null || password.length() <= 8 || !password.matches("^(?=.*[a-zA-Z])(?=.*\\d).+$")) {
+                return ResponseEntity.badRequest().body("Password must be longer than 8 characters and should be alphanumeric");
+            }
 
-        if (username == null || username.length() != 6) {
-            return ResponseEntity.badRequest().body("Username must be exactly 6 characters.");
-        }
-        if (password == null || password.length() <= 8 || !password.matches("^(?=.*[a-zA-Z])(?=.*\\d).+$")) {
-            return ResponseEntity.badRequest().body("Password must be longer than 8 characters and should be alphanumeric");
-        }
+            // Check if user already exists
+            User existingUser = userRepository.findByUserName(username);
+            System.out.println(" Existing User : " + existingUser);
+            if (existingUser != null) {
+                return ResponseEntity.status(409).body("Username already exists. Please choose a different username.");
+            }
 
-        User user = UserMapper.toEntity(userDTO);
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(UserMapper.toDTO(savedUser));
+            // Save new user
+            User user = UserMapper.toEntity(userDTO);
+            User savedUser = userRepository.save(user);
+
+            return ResponseEntity.ok(UserMapper.toDTO(savedUser));
+
+        } catch (Exception e) {
+            e.printStackTrace(); // For debugging
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
     }
 
-    // Login User
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO loginRequest) {
-        String username = loginRequest.getUserName();
-        String password = loginRequest.getPassword();
-
-        User user = userRepository.findByUserName(username);
-
-        if (user == null || !user.getPassword().equals(password)) {
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
-
-        return ResponseEntity.ok("Login successful for user: " + username);
-    }
-
-    // Get User by ID
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
         return userRepository.findById(id)
@@ -66,7 +65,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Get All Users
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userRepository.findAll()
@@ -76,7 +74,6 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    // Update User
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
         return userRepository.findById(id)
@@ -89,7 +86,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Delete User
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         if (!userRepository.existsById(id)) {
@@ -99,3 +95,4 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
+
