@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Product {
     @Id
     private String productId;
+    
     private String productName;
     private int numberOfCapabilities;
 }

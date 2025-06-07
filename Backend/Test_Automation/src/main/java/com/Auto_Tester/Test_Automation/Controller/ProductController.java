@@ -20,17 +20,23 @@ public class ProductController {
     private ProductRepository productRepository;
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<?> createProduct(@RequestBody ProductDTO productDTO) {
+        String productId = productDTO.getProductId();
+        String productName = productDTO.getProductName();
+
         Product product = new Product();
-        product.setProductName(productDTO.getProductName());
-        product.setNumberOfCapabilities(0);
+        product.setProductId(productId);
+        product.setProductName(productName);
+        product.setNumberOfCapabilities(0);  
 
         Product savedProduct = productRepository.save(product);
 
         productDTO.setProductId(savedProduct.getProductId());
         productDTO.setNumberOfCapabilities(0);
+
         return ResponseEntity.ok(productDTO);
     }
+
 
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
@@ -79,11 +85,21 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable String id) {
-        if (productRepository.existsById(id)) {
-            productRepository.deleteById(id);
-            return ResponseEntity.ok("Product deleted successfully!");
-        } else {
+        Optional<Product> productOptional = productRepository.findById(id);
+
+        if (productOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        Product product = productOptional.get();
+
+        if (product.getNumberOfCapabilities() > 0) {
+            return ResponseEntity.badRequest()
+                .body("Cannot delete product because it has associated capabilities.");
+        }
+
+        productRepository.deleteById(id);
+        return ResponseEntity.ok("Product deleted successfully!");
     }
+
 }
